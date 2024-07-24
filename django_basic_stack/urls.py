@@ -20,11 +20,24 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+api_url = 'api/'
+
 urlpatterns = [
+    # admin
     path('profiadmin/', admin.site.urls),
+    # rest framework
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # apps
+    path(f'{api_url}shop/', include('apps.shop.urls')),
 ]
 
+# Run debug toolbar only for development
+
 if settings.DEBUG:
+
     import debug_toolbar
 
     urlpatterns = (
