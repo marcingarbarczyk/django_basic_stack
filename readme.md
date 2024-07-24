@@ -1,0 +1,3 @@
+# Django Basic Stack
+
+More info soon...

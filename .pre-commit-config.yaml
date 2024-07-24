@@ -1,0 +1,46 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        files: \.py$
+      - id: end-of-file-fixer
+        files: \.py$
+      - id: double-quote-string-fixer
+        files: \.py$
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        types: [ python ]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (python)
+        files: \.py$
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+        files: \.py$
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        files: \.py$
+        additional_dependencies:
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-tuple
+          - flake8-simplify
+          - flake8-variables-names
+          - flake8-django
+          - flake8-bandit
+  - repo: local
+    hooks:
+      - id: check-django-model-migrations-are-created
+        name: Check Django model migrations are created
+        language: system
+        entry: docker compose run -T web python manage.py makemigrations --check --dry-run
+        pass_filenames: false

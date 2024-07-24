@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:13
+    container_name: django-basic-stack-postgres
+    hostname: django-basic-stack-postgres
+    volumes:
+    # For initial DB (.sql)
+    #  - ./dev/web/initial_db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dev/data/db:/var/lib/postgresql/data
+    env_file:
+      - dev/envs/.env
+    networks:
+      - internal_network
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+  web:
+    image: django-basic-stack:latest.dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dev-django-basic-stack
+    hostname: dev-django-basic-stack
+    command: "sh -c /develop/web/entrypoint.sh"
+    volumes:
+      - .:/app
+      - ./requirements:/requirements
+    ports:
+      - "81:80"
+    env_file:
+      - dev/envs/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal_network
+  celery:
+    image: django-basic-stack:latest.dev
+    command: "sh -c /develop/celery/entrypoint.sh"
+    container_name: dev-django-basic-celery
+    hostname: dev-django-basic-celery
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    env_file:
+      - dev/envs/.env
+    networks:
+      - internal_network
+  redis:
+    container_name: django-basic-stack-redis
+    hostname: django-basic-stack-redis
+    image: redis:alpine
+    volumes:
+      - ./dev/data/redis:/data
+    networks:
+      - internal_network
+  maildev:
+    image: maildev/maildev
+    container_name: mail
+    hostname: mail
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - internal_network
+    environment:
+      - "MAILDEV_INCOMING_USER=dev"
+      - "MAILDEV_INCOMING_PASS=123456"
+networks:
+  internal_network:
+    external: false

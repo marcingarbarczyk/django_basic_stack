@@ -1,0 +1,130 @@
+version: "3.9"
+
+x-common-envs: &common-envs
+   DJANGO_BASIC_STACK_ALLOWED_HOSTS: ${DJANGO_BASIC_STACK_ALLOWED_HOSTS}
+   DJANGO_BASIC_STACK_BASE_URL: ${DJANGO_BASIC_STACK_BASE_URL}
+   DJANGO_BASIC_STACK_CSRF_COOKIE_DOMAIN: ${DJANGO_BASIC_STACK_CSRF_COOKIE_DOMAIN}
+   DJANGO_BASIC_STACK_CSRF_TRUSTED_ORIGINS: ${DJANGO_BASIC_STACK_CSRF_TRUSTED_ORIGINS}
+   DJANGO_BASIC_STACK_DEBUG: ${DJANGO_BASIC_STACK_DEBUG}
+   DJANGO_BASIC_STACK_DEFAULT_FROM_EMAIL: ${DJANGO_BASIC_STACK_DEFAULT_FROM_EMAIL}
+   DJANGO_BASIC_STACK_EMAIL_BACKEND: ${DJANGO_BASIC_STACK_EMAIL_BACKEND}
+   DJANGO_BASIC_STACK_EMAIL_HOST: ${DJANGO_BASIC_STACK_EMAIL_HOST}
+   DJANGO_BASIC_STACK_EMAIL_HOST_PASSWORD: ${DJANGO_BASIC_STACK_EMAIL_HOST_PASSWORD}
+   DJANGO_BASIC_STACK_EMAIL_HOST_USER: ${DJANGO_BASIC_STACK_EMAIL_HOST_USER}
+   DJANGO_BASIC_STACK_EMAIL_PORT: ${DJANGO_BASIC_STACK_EMAIL_PORT}
+   DJANGO_BASIC_STACK_EMAIL_USE_SSL: ${DJANGO_BASIC_STACK_EMAIL_USE_SSL}
+   DJANGO_BASIC_STACK_MEDIA_ROOT: ${DJANGO_BASIC_STACK_MEDIA_ROOT}
+   DJANGO_BASIC_STACK_NEW_REGISTRATIONS_EMAIL_RECEIVERS: ${DJANGO_BASIC_STACK_NEW_REGISTRATIONS_EMAIL_RECEIVERS}
+   DJANGO_BASIC_STACK_SECRETKEY: ${DJANGO_BASIC_STACK_SECRETKEY}
+   DJANGO_BASIC_STACK_STATIC_ROOT: ${DJANGO_BASIC_STACK_STATIC_ROOT}
+   DJANGO_BASIC_STACK_TPAY_MERCHANT_ID: ${DJANGO_BASIC_STACK_TPAY_MERCHANT_ID}
+   DJANGO_BASIC_STACK_TPAY_MERCHANT_SECURITY_CODE: ${DJANGO_BASIC_STACK_TPAY_MERCHANT_SECURITY_CODE}
+   DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+   POSTGRES_DB: ${POSTGRES_DB}
+   POSTGRES_DBHOST: ${POSTGRES_DBHOST}
+   POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+   POSTGRES_USER: ${POSTGRES_USER}
+   SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+services:
+  nginx:
+    image: nginx
+    healthcheck:
+      test: curl --fail -s http://localhost:80/static/admin/css/base.css || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    volumes:
+      - django_basic_stack.com_data_static:/usr/share/nginx/html/static:ro
+      - django_basic_stack.com_data_media:/usr/share/nginx/html/media:ro
+      - nginx_configs.django_basic_stack.com_data:/etc/nginx/conf.d/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.02"
+          memory: "50M"
+        reservations:
+          cpus: "0.01"
+          memory: "25M"
+      update_config:
+        delay: 10s
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+    ports:
+      - "9039:80"
+    networks:
+      - django_basic_stack_network
+
+  web:
+    image: web_image
+    healthcheck:
+      test: curl --fail -s http://localhost:8000/ || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    volumes:
+      - django_basic_stack.com_data_static:/app/static
+      - django_basic_stack.com_data_media:/app/media
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - logstorage.django_basic_stack.com_data:/logs
+    environment:
+      <<: *common-envs
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.20"
+          memory: "200M"
+        reservations:
+          cpus: "0.10"
+          memory: "100M"
+      update_config:
+        delay: 10s
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+    entrypoint: /prod/web/entrypoint.sh
+    ports:
+      - "9040:8000"
+    networks:
+      - django_basic_stack_network
+
+networks:
+  django_basic_stack_network:
+    external: true
+
+volumes:
+  django_basic_stack.com_data_static:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /storage/swarm-storage/django_basic_stack.com_data_static
+
+  django_basic_stack.com_data_media:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /storage/swarm-storage/django_basic_stack.com_data_media
+
+  nginx_configs.django_basic_stack.com_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /storage/swarm-storage/nginx_configs
+
+  logstorage.django_basic_stack.com_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /storage/swarm-storage/logstorage.django_basic_stack.com_data

@@ -1,0 +1,13 @@
+/.github/
+/crons/
+/supervisor_configs/
+/.gitignore
+/.idea/
+/.git/
+/.dockerignore/
+/docker-compose.yml
+/dev/web/Dockerfile
+/dev/web/initial_db/init.sql
+/dev/data/
+/dev/envs/
+/readme.md

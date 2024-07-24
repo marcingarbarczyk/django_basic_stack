@@ -1,0 +1,10 @@
+[flake8]
+max-line-length=120
+ignore = E501, W503, E203, S113, DJ01
+exclude = production.py, docker.py, common.py
+per-file-ignores =
+    # Ignore F401 for module imported but unused
+    # Ignore F403 for star imports
+    */__init__.py: F401, F403
+    krs.py: W605
+    import_administrative_areas.py: W605

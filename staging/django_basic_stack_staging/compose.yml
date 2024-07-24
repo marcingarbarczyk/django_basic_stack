@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  web:
+    image: django_basic_stack:latest.dev
+    hostname: django_basic_stack.test
+    healthcheck:
+      test: curl --fail -s http://localhost:80/ || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    volumes:
+      - django_basic_stack:/app
+      - django_basic_stack_static:/app/static
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - django_basic_stack_logs:/logs
+    env_file:
+      - envs/.env
+    entrypoint: ["/prod/web/entrypoint.sh", "80"]
+    ports:
+      - "7019:80"
+    networks:
+      - django_basic_stack_network
+
+networks:
+  django_basic_stack_network:
+    external: false
+
+volumes:
+  django_basic_stack:
+    external: true
+  django_basic_stack_static:
+    external: true
+  django_basic_stack_media:
+    external: true
+  django_basic_stack_logs:
+    external: true

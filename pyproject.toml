@@ -1,0 +1,29 @@
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 120
+skip_gitignore = true
+known_first_party = [
+    "accounts", "administrative_areas", "asteval",
+    "beacons", "ceidg", "constantia", "countries", "libraries",
+    "mojepanstwo", "notification", "postal_codes",
+    "smartforms", "toolkit"
+]
+combine_as_imports = true
+include_trailing_comma = true
+sections = [
+    "FUTURE", "STDLIB", "THIRDPARTY",
+    "FIRSTPARTY", "LOCALFOLDER"
+]
+no_lines_before = ["LOCALFOLDER"]
+
+[tool.autoflake]
+in-place = true
+remove-all-unused-imports = true
+remove-unused-variables = true
+recursive = true
+ignore-init-module-imports = true
