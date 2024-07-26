@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand
-from apps.shop.factories import ProductFactory, CategoryFactory, OrderFactory, OrderItemFactory, UserFactory
+
+from apps.shop.factories import CategoryFactory, OrderFactory, OrderItemFactory, ProductFactory, UserFactory
 
 
 class Command(BaseCommand):
-    help = 'Create random users, products, categories, orders and order items'
-
     def handle(self, *args, **options):
         users = [UserFactory() for _ in range(5)]
         categories = [CategoryFactory() for _ in range(3)]

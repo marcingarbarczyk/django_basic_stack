@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 
-from .models import Product, Category, Order, OrderItem
-from .serializers import ProductSerializer, CategorySerializer, OrderSerializer, OrderItemSerializer
+from .models import Category, Order, OrderItem, Product
+from .serializers import CategorySerializer, OrderItemSerializer, OrderSerializer, ProductSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):

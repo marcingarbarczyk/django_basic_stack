@@ -1,13 +1,13 @@
 import factory
-from django.contrib.auth.models import User
-from .models import Product, Category, Order, OrderItem
+from django.contrib.auth import get_user_model
+
+from .models import Category, Order, OrderItem, Product
 
 
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = User
+        model = get_user_model()
 
-    username = factory.Faker('user_name')
     email = factory.Faker('email')
 
 

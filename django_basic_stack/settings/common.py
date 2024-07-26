@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     # APPS
     'utils',
+    'apps.membership',
     'apps.shop',
 ]
 
@@ -210,3 +211,8 @@ TPAY_DEBUG_RETURN_URL = os.environ.get('TPAY_DEBUG_RETURN_URL')
 
 CELERY_BROKER_URL = 'redis://django-basic-stack-redis:6379/0'
 CELERY_RESULT_BACKEND = 'redis://django-basic-stack-redis:6379/0'
+
+
+# User extending
+
+AUTH_USER_MODEL = 'membership.User'
