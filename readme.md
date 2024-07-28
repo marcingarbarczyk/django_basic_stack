@@ -13,6 +13,8 @@
 1. Rename folder of this repo.
 2. Rename all string from "django_basic_stack" to "your_app_name".
 3. Rename all string from "DJANGO_BASIC_STACK" to "YOUR_APP_NAME".
+4. Rename all string from "django-basic-stack" to "your_app_name".
+5. Rename catalog "django_basic_stack" (settings, wsgi etc.) to "your_app_name".
 
 ## How to start:
 

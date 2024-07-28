@@ -41,8 +41,8 @@ services:
   celery:
     image: django-basic-stack:latest.dev
     command: "sh -c /develop/celery/entrypoint.sh"
-    container_name: dev-django-basic-celery
-    hostname: dev-django-basic-celery
+    container_name: dev-django-basic-stack-celery
+    hostname: dev-django-basic-stack-celery
     volumes:
       - .:/app
     depends_on:
