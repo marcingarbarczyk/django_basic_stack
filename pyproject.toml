@@ -27,3 +27,7 @@ remove-all-unused-imports = true
 remove-unused-variables = true
 recursive = true
 ignore-init-module-imports = true
+
+[pytest]
+DJANGO_SETTINGS_MODULE = "django_basic_stack.settings.tests"
+python_files = "test_*.py"
