@@ -25,7 +25,10 @@ class ProductFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker('word')
     description = factory.Faker('paragraph')
-    price = factory.Faker('random_number', digits=5)
+    price = factory.Faker(
+        'random_number',
+        digits=5,
+    )
     category = factory.SubFactory(CategoryFactory)
 
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from utils.managers import ActiveManager
 
@@ -24,10 +25,22 @@ class ActiveMixin(models.Model):
     """
 
     is_active = models.BooleanField(default=True)
+    activation_date = models.DateTimeField(null=True, blank=True)
+    deactivation_date = models.DateTimeField(null=True, blank=True)
+
     active_objects = ActiveManager()
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            self.activation_date = timezone.now()
+            self.deactivation_date = None
+        else:
+            self.deactivation_date = timezone.now()
+
+        super(ActiveMixin, self).save(*args, **kwargs)
 
 
 class TimestampMixin(models.Model):
