@@ -1,0 +1,43 @@
+{% load i18n static %}
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+
+<ul>
+    <li>
+        <input type="text" id="filter-input-{{ title|slugify }}"/>
+        <div id="filter-list-{{ title|slugify }}">
+            {% for choice in choices %}
+                <a href="{% if choice.query_string %}{{ choice.query_string|iriencode }}{% endif %}"
+                   style="display: none;"
+                   class="filter-option{% if choice.selected %} selected{% endif %}">
+                    {{ choice.display }}
+                </a>
+            {% endfor %}
+        </div>
+    </li>
+</ul>
+
+<script>
+    (function() {
+        let input = document.querySelector('#filter-input-{{ title|slugify }}');
+        let anchors = document.querySelectorAll('#filter-list-{{ title|slugify }} a');
+        let selected = document.querySelector('#filter-list-{{ title|slugify }} a.selected');
+
+        if (selected !== anchors[0]) {
+            input.value = selected.innerText.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim();
+        }
+
+        function filterChoices() {
+            let filter = input.value.toLowerCase();
+
+            anchors.forEach(anchor => {
+                if (filter && anchor.innerText.toLowerCase().includes(filter)) {
+                    anchor.style.display = '';
+                } else {
+                    anchor.style.display = 'none';
+                }
+            });
+        }
+
+        input.addEventListener('keyup', filterChoices);
+    })();
+</script>

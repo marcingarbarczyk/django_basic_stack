@@ -1,0 +1,13 @@
+<form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+        <label for="{{ form.username.id_for_label }}">
+            E-mail <span class="required">*</span>
+        </label>
+        {{ form.username }}
+        <label for="{{ form.password.id_for_label }}">
+            Password <span class="required">*</span>
+        </label>
+        {{ form.password }}
+        <button type="submit" class="btn">Login</button>
+</form>

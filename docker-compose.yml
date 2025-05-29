@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:13
@@ -30,7 +28,7 @@ services:
       - .:/app
       - ./requirements:/requirements
     ports:
-      - "81:80"
+      - "8888:80"
     env_file:
       - dev/envs/.env
     depends_on:
@@ -59,13 +57,26 @@ services:
       - ./dev/data/redis:/data
     networks:
       - internal_network
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.2
+    container_name: django-basic-stack-elasticsearch
+    hostname: django-basic-stack-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./dev/data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - internal_network
   maildev:
     image: maildev/maildev
     container_name: mail
     hostname: mail
     ports:
-      - "1080:1080"
-      - "1025:1025"
+      - "1081:1080"
+      - "1026:1025"
     networks:
       - internal_network
     environment:

@@ -25,9 +25,3 @@
 ## Additional info:
 
 1. In Makefile you have some useful commands for example: compile_packages
-
-
-## Soon
-
-1. User extended
-2. Elastic Search

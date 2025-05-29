@@ -1,0 +1,2 @@
+class TooManyLoginAttemptsException(Exception):
+    pass

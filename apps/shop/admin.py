@@ -5,19 +5,38 @@ from .models import Category, Order, OrderItem, Product
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'description', 'price', 'category']
+    list_display = [
+        'id',
+        'name',
+        'description',
+        'price',
+        'category',
+    ]
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'description']
+    list_display = [
+        'id',
+        'name',
+        'description',
+    ]
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'date_ordered']
+    list_display = [
+        'id',
+        'user',
+        'date_ordered',
+    ]
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['id', 'product', 'order', 'quantity']
+    list_display = [
+        'id',
+        'product',
+        'order',
+        'quantity',
+    ]

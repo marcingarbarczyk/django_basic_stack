@@ -47,14 +47,20 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'corsheaders',
+    'allauth',
+    'allauth.account',
     # APPS
-    'utils',
+    'apps.utils',
     'apps.membership',
     'apps.shop',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,7 +69,31 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {'client_id': '123', 'secret': '456', 'key': ''}
+    }
+}
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+ACCOUNT_USERNAME_REQUIRED = False
+
+ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_UNIQUE_EMAIL = True
+
 
 SITE_ID = 1
 
@@ -178,20 +208,29 @@ DEFAULT_FROM_EMAIL = os.environ.get('DJANGO_BASIC_STACK_DEFAULT_FROM_EMAIL')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.membership.authentication.CookieJWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '10/minute',
+        'register': '10/minute',
+    },
 }
 
 # Simple JWT
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'your_secret_key',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
 
@@ -204,15 +243,38 @@ if not DEBUG:
 # Tpay debug URLS (ngrok)
 
 TPAY_DEBUG_RESULT_URL = os.environ.get('TPAY_DEBUG_RESULT_URL')
+
 TPAY_DEBUG_RETURN_URL = os.environ.get('TPAY_DEBUG_RETURN_URL')
 
 
 # Celery
 
 CELERY_BROKER_URL = 'redis://django-basic-stack-redis:6379/0'
+
 CELERY_RESULT_BACKEND = 'redis://django-basic-stack-redis:6379/0'
 
 
 # User extending
 
 AUTH_USER_MODEL = 'membership.User'
+
+
+# Api documentation
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+
+# CORS settings
+
+CORS_ALLOWED_ORIGINS = [
+    'http://example.com',
+    'http://another-example.com',
+    'http://localhost:5173',
+]
+
+CORS_ALLOW_CREDENTIALS = True

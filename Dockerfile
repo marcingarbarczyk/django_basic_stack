@@ -1,12 +1,22 @@
-FROM python:3.12.2
+FROM python:3.13-slim AS builder
 
-RUN apt-get update && \
-    apt-get install -y locales locales-all && \
-    locale-gen pl_PL
+RUN mkdir /app
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 
 COPY requirements/ /requirements
 
-RUN pip install -r requirements/requirements.txt
+RUN pip install --upgrade pip && pip install  --no-cache-dir -r /requirements/requirements.txt
+
+
+FROM python:3.13-slim
+
+COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 COPY prod /prod
 COPY dev /develop
@@ -20,3 +30,6 @@ RUN chmod +x /develop/web/entrypoint.sh && \
 COPY / /app/
 
 WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
