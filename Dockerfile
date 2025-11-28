@@ -18,6 +18,12 @@ FROM python:3.13-slim
 COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+RUN groupadd -g ${GROUP_ID} appuser && \
+    useradd -u ${USER_ID} -g ${GROUP_ID} -m -s /bin/bash appuser
+
 COPY prod /prod
 COPY dev /develop
 
@@ -29,7 +35,11 @@ RUN chmod +x /develop/web/entrypoint.sh && \
 
 COPY / /app/
 
+RUN chown -R appuser:appuser /app /prod /develop
+
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+
+USER appuser
